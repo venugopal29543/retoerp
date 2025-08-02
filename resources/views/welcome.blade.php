@@ -51,7 +51,7 @@
             border: 1px solid #d1d5db;
             border-radius: 4px;
             font-size: 0.875rem;
-            min-width: 150px;
+            min-width: 60px;
         }
         
         .btn-primary {
@@ -475,7 +475,7 @@
             }
             
             .search-input {
-                min-width: 100%;
+                min-width: 60%;
             }
         }
         
@@ -734,15 +734,12 @@
     <!-- Main Content -->
     <div class="max-w-full mx-auto p-2">
         <!-- Compact Header -->
-        <div class="compact-header text-center">
-            <h2 class="text-2xl font-bold text-gray-800 mb-1">SATTENAPALLI Layout - Plot Booking</h2>
-        </div>
-
+       <!-- Plot Layout Component -->
+        <x-plot-layout />
         <!-- Control Panel Component -->
         <x-control-panel />
 
-        <!-- Plot Layout Component -->
-        <x-plot-layout />
+        
 
         <!-- Statistics Cards Component -->
         <x-statistics-cards />
