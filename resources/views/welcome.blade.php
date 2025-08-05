@@ -740,9 +740,7 @@
         <x-control-panel />
 
         
-
-        <!-- Statistics Cards Component -->
-        <x-statistics-cards />
+ 
     </div>
 
     <!-- Modal Components -->
@@ -758,6 +756,9 @@
         // Initialize modules when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Initializing RetoERP Plot Management System...');
+            
+            // Initialize real-time sync first
+            initializeRealTimeSync();
             
             // Wait for scripts to load
             setTimeout(() => {
@@ -792,6 +793,230 @@
             }, 500);
         });
         
+        // Real-time synchronization with dashboard
+        function initializeRealTimeSync() {
+            console.log('🔄 Initializing real-time sync with dashboard...');
+            
+            // Listen for storage changes (cross-tab sync from dashboard)
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'plot_sync') {
+                    const syncData = JSON.parse(event.newValue);
+                    handleDashboardUpdate(syncData);
+                }
+            });
+            
+            // Listen for same-tab updates from dashboard
+            window.addEventListener('plotUpdate', (event) => {
+                handleDashboardUpdate(event.detail);
+            });
+            
+            console.log('✅ Real-time sync initialized');
+        }
+        
+        // Handle updates from dashboard
+        function handleDashboardUpdate(syncData) {
+            console.log('📥 Received update from dashboard:', syncData);
+            
+            if (syncData.type === 'plot_update') {
+                const plotId = syncData.plotId;
+                const changes = syncData.changes;
+                
+                // Reload plot data from JSON file to get permanent changes
+                reloadPlotDataFromServer();
+                
+                // Update plot visual status immediately for instant feedback
+                updatePlotVisualStatus(plotId, changes);
+                
+                // Update statistics if status changed
+                if (changes.status) {
+                    updateStatisticsFromDashboard();
+                }
+                
+                // Show sync notification
+                showSyncNotification(`Plot ${plotId} updated from dashboard`);
+                
+                // Highlight the updated plot
+                highlightUpdatedPlot(plotId);
+            }
+        }
+
+        // Reload plot data from server
+        async function reloadPlotDataFromServer() {
+            try {
+                console.log('🔄 Reloading plot data from server...');
+                
+                // Check if PlotManager is available and reload data
+                if (window.plotManager && typeof window.plotManager.refreshPlotData === 'function') {
+                    const success = await window.plotManager.refreshPlotData();
+                    if (success) {
+                        console.log('✅ Plot data reloaded successfully from JSON file');
+                    } else {
+                        console.log('⚠️ Failed to reload plot data');
+                    }
+                } else {
+                    console.log('⚠️ PlotManager not available for reload');
+                }
+            } catch (error) {
+                console.error('❌ Error reloading plot data:', error);
+            }
+        }
+        
+        // Update plot visual status in SVG
+        function updatePlotVisualStatus(plotId, changes) {
+            const plotElement = document.getElementById(`plot-${plotId}`);
+            if (plotElement) {
+                // Update status attribute
+                if (changes.status) {
+                    plotElement.setAttribute('data-status', changes.status);
+                    
+                    // Update visual appearance based on new status
+                    switch (changes.status) {
+                        case 'available':
+                            plotElement.setAttribute('fill', '#dff0d8');
+                            plotElement.setAttribute('stroke', '#5cb85c');
+                            break;
+                        case 'booked':
+                            plotElement.setAttribute('fill', '#f0ad4e');
+                            plotElement.setAttribute('stroke', '#d58512');
+                            break;
+                        case 'blocked':
+                            plotElement.setAttribute('fill', '#d9534f');
+                            plotElement.setAttribute('stroke', '#c9302c');
+                            break;
+                    }
+                    plotElement.setAttribute('stroke-width', '3');
+                }
+                
+                console.log(`✅ Updated plot ${plotId} visual status`);
+            }
+        }
+        
+        // Update statistics display
+        function updateStatisticsFromDashboard() {
+            // Recount plot statuses from DOM
+            const plots = document.querySelectorAll('[id^="plot-"]');
+            let available = 0, booked = 0, blocked = 0;
+            
+            plots.forEach(plot => {
+                const status = plot.getAttribute('data-status');
+                switch (status) {
+                    case 'available':
+                        available++;
+                        break;
+                    case 'booked':
+                        booked++;
+                        break;
+                    case 'blocked':
+                        blocked++;
+                        break;
+                }
+            });
+            
+            // Update statistics display
+            const availableElements = document.querySelectorAll('[data-stat="available"]');
+            const bookedElements = document.querySelectorAll('[data-stat="booked"]');
+            const blockedElements = document.querySelectorAll('[data-stat="blocked"]');
+            const totalElements = document.querySelectorAll('[data-stat="total"]');
+            
+            availableElements.forEach(el => el.textContent = available);
+            bookedElements.forEach(el => el.textContent = booked);
+            blockedElements.forEach(el => el.textContent = blocked);
+            totalElements.forEach(el => el.textContent = plots.length);
+            
+            console.log('📊 Statistics updated:', { available, booked, blocked, total: plots.length });
+        }
+        
+        // Highlight updated plot temporarily
+        function highlightUpdatedPlot(plotId) {
+            const plotElement = document.getElementById(`plot-${plotId}`);
+            if (plotElement) {
+                // Save original style
+                const originalFill = plotElement.getAttribute('fill');
+                const originalStroke = plotElement.getAttribute('stroke');
+                const originalStrokeWidth = plotElement.getAttribute('stroke-width');
+                
+                // Apply highlight
+                plotElement.setAttribute('fill', '#ffeb3b');
+                plotElement.setAttribute('stroke', '#ff9800');
+                plotElement.setAttribute('stroke-width', '5');
+                
+                // Add pulsing animation
+                plotElement.style.animation = 'pulse 1s ease-in-out 3';
+                
+                // Restore original style after highlight
+                setTimeout(() => {
+                    plotElement.setAttribute('fill', originalFill);
+                    plotElement.setAttribute('stroke', originalStroke);
+                    plotElement.setAttribute('stroke-width', originalStrokeWidth);
+                    plotElement.style.animation = '';
+                }, 3000);
+            }
+        }
+        
+        // Show sync notification
+        function showSyncNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                font-weight: 600;
+                box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+            `;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <svg style="width: 20px; height: 20px;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Animate out and remove
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // Send plot interaction to dashboard
+        function notifyDashboardOfInteraction(plotId) {
+            const syncData = {
+                type: 'plot_interaction',
+                plotId: plotId,
+                timestamp: Date.now()
+            };
+            
+            // Store in localStorage for cross-tab communication
+            localStorage.setItem('welcome_to_dashboard_sync', JSON.stringify(syncData));
+            
+            // Dispatch custom event for same-tab communication
+            window.dispatchEvent(new CustomEvent('welcomePageUpdate', {
+                detail: syncData
+            }));
+            
+            console.log('📤 Notified dashboard of plot interaction:', syncData);
+        }
+        
         // Test system features
         function testSystemFeatures() {
             console.log('🧪 Testing system features...');
@@ -812,12 +1037,18 @@
             const modal = document.getElementById('enhancedModal');
             console.log(`🗂️ Enhanced modal: ${modal ? 'Found' : 'Missing'}`);
             
+            // Initialize statistics counting
+            updateStatisticsFromDashboard();
+            
             console.log('✅ Feature test complete!');
         }
         
-        // Simple plot click handlers for SVG elements
+        // Enhanced plot click handler with dashboard sync
         function handlePlotClick(plotId) {
             console.log(`🏠 Plot ${plotId} clicked`);
+            
+            // Notify dashboard of interaction
+            notifyDashboardOfInteraction(plotId);
             
             try {
                 if (window.plotManager && window.plotManager.openEnhancedModal) {
@@ -857,6 +1088,9 @@
             if (status === 'booked') {
                 el.setAttribute("fill", "#f0ad4e");
                 el.setAttribute("stroke", "#d58512");
+            } else if (status === 'blocked') {
+                el.setAttribute("fill", "#d9534f");
+                el.setAttribute("stroke", "#c9302c");
             } else {
                 el.setAttribute("fill", "#dff0d8");
                 el.setAttribute("stroke", "#5cb85c");
@@ -938,6 +1172,17 @@
                 container.style.transform = 'scale(1)';
             }
         }
+        
+        // Add pulse animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

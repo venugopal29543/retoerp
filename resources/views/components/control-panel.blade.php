@@ -60,21 +60,21 @@
             <div class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full">
                 <div class="w-2 h-2 bg-green-500 rounded-full"></div>
                 <span class="hidden sm:inline">Available:</span>
-                <span id="availableCount" class="font-bold">11</span>
+                <span id="availableCount" data-stat="available" class="font-bold">11</span>
             </div>
             
             <!-- Blocked -->
             <div class="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded-full">
                 <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
                 <span class="hidden sm:inline">Blocked:</span>
-                <span id="blockedCount" class="font-bold">0</span>
+                <span id="blockedCount" data-stat="blocked" class="font-bold">0</span>
             </div>
             
             <!-- Booked -->
             <div class="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-full">
                 <div class="w-2 h-2 bg-red-500 rounded-full"></div>
                 <span class="hidden sm:inline">Booked:</span>
-                <span id="bookedCount" class="font-bold">2</span>
+                <span id="bookedCount" data-stat="booked" class="font-bold">2</span>
             </div>
             
             <!-- Total -->
@@ -83,7 +83,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>
                 <span class="hidden sm:inline">Total:</span>
-                <span id="totalCount" class="font-bold">13</span>
+                <span id="totalCount" data-stat="total" class="font-bold">13</span>
             </div>
         </div>
     </div>
@@ -94,22 +94,22 @@
             <div class="text-center">
                 <div class="w-3 h-3 bg-green-500 rounded-full mx-auto mb-1"></div>
                 <div class="text-gray-600">Available</div>
-                <div class="font-bold text-green-700" id="availableCountMobile">11</div>
+                <div class="font-bold text-green-700" id="availableCountMobile" data-stat="available">11</div>
             </div>
             <div class="text-center">
                 <div class="w-3 h-3 bg-yellow-500 rounded-full mx-auto mb-1"></div>
                 <div class="text-gray-600">Blocked</div>
-                <div class="font-bold text-yellow-700" id="blockedCountMobile">0</div>
+                <div class="font-bold text-yellow-700" id="blockedCountMobile" data-stat="blocked">0</div>
             </div>
             <div class="text-center">
                 <div class="w-3 h-3 bg-red-500 rounded-full mx-auto mb-1"></div>
                 <div class="text-gray-600">Booked</div>
-                <div class="font-bold text-red-700" id="bookedCountMobile">2</div>
+                <div class="font-bold text-red-700" id="bookedCountMobile" data-stat="booked">2</div>
             </div>
             <div class="text-center">
                 <div class="w-3 h-3 bg-gray-500 rounded-full mx-auto mb-1"></div>
                 <div class="text-gray-600">Total</div>
-                <div class="font-bold text-gray-700" id="totalCountMobile">13</div>
+                <div class="font-bold text-gray-700" id="totalCountMobile" data-stat="total">13</div>
             </div>
         </div>
     </div>
