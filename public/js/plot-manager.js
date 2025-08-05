@@ -272,17 +272,64 @@ class PlotManager {
         try {
             console.log('📊 Loading plot data...');
             
-            // Try to fetch from API first
-            const response = await fetch('/api/plots');
+            // Fetch directly from JSON file to get latest updates
+            const response = await fetch('/data/plots.json?cache=' + Date.now());
             if (response.ok) {
                 const plotsData = await response.json();
+                this.processAndStorePlotData(plotsData);
                 this.generateDynamicPlots(plotsData);
             } else {
-                throw new Error('API not available');
+                throw new Error('JSON file not available');
             }
         } catch (error) {
-            console.log('⚠️ API not available, loading static plots');
+            console.log('⚠️ Plot data not available, loading static plots');
             this.loadStaticPlots();
+        }
+    }
+
+    // Process and store plot data for sync
+    processAndStorePlotData(plotsData) {
+        // Store the plot data globally for sync operations
+        window.currentPlotsData = plotsData;
+        
+        // Update plot status from the latest data
+        if (plotsData.layouts) {
+            plotsData.layouts.forEach(layout => {
+                layout.plots.forEach(plot => {
+                    const plotElement = document.getElementById(`plot-${plot.id}`);
+                    if (plotElement) {
+                        // Update data attributes
+                        plotElement.setAttribute('data-status', plot.status || 'available');
+                        plotElement.setAttribute('data-price', plot.price || 0);
+                        plotElement.setAttribute('data-area', plot.area || 0);
+                        plotElement.setAttribute('data-display-name', plot.displayName || plot.id);
+                        
+                        // Update visual appearance based on current status
+                        this.updatePlotVisualAppearance(plotElement, plot.status || 'available');
+                    }
+                });
+            });
+        }
+    }
+
+    // Update plot visual appearance
+    updatePlotVisualAppearance(plotElement, status) {
+        switch (status) {
+            case 'available':
+                plotElement.setAttribute('fill', '#dff0d8');
+                plotElement.setAttribute('stroke', '#5cb85c');
+                break;
+            case 'booked':
+                plotElement.setAttribute('fill', '#f0ad4e');
+                plotElement.setAttribute('stroke', '#d58512');
+                break;
+            case 'blocked':
+                plotElement.setAttribute('fill', '#d9534f');
+                plotElement.setAttribute('stroke', '#c9302c');
+                break;
+            default:
+                plotElement.setAttribute('fill', '#dff0d8');
+                plotElement.setAttribute('stroke', '#5cb85c');
         }
     }
 
@@ -376,6 +423,19 @@ class PlotManager {
                 plot.style.pointerEvents = 'none';
             }
         });
+    }
+
+    // Public method to refresh plot data
+    async refreshPlotData() {
+        console.log('🔄 Refreshing plot data...');
+        try {
+            await this.loadDynamicPlots();
+            console.log('✅ Plot data refreshed successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Error refreshing plot data:', error);
+            return false;
+        }
     }
 }
 
