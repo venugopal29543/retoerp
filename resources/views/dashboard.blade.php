@@ -9,6 +9,10 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('css/mobile-fixes.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/plot-visualization.css') }}">
+    
     <!-- DataTables for better grid display -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwindcss.min.css">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>

@@ -29,7 +29,7 @@
                     ],
                     "price": 850000,
                     "area": 1800,
-                    "status": "available",
+                    "status": "blocked",
                     "amenities": [
                         "Water",
                         "Electricity",
@@ -94,7 +94,7 @@
                     ],
                     "price": 1250000,
                     "area": 2200,
-                    "status": "booked",
+                    "status": "available",
                     "amenities": [
                         "Water",
                         "Electricity",
@@ -127,7 +127,7 @@
                     ],
                     "price": 1180000,
                     "area": 2200,
-                    "status": "booked",
+                    "status": "available",
                     "amenities": [
                         "Water",
                         "Electricity",
@@ -192,7 +192,7 @@
                     ],
                     "price": 950000,
                     "area": 1900,
-                    "status": "available",
+                    "status": "booked",
                     "amenities": [
                         "Water",
                         "Electricity",
