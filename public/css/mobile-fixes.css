@@ -1,0 +1,62 @@
+/* Mobile responsiveness fixes */
+@media (max-width: 768px) {
+    /* Fix for filter and status indicators colliding */
+    .filter-status-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    /* Make status indicators stack vertically on mobile */
+    .status-indicators {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+    }
+    
+    /* Make search field full width on mobile */
+    .dataTables_filter {
+        width: 100% !important;
+        margin-bottom: 10px;
+    }
+    
+    /* Fix filter buttons layout */
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+    
+    /* Fix plot grid visualization */
+    .plot-visualization {
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Prevent fragments from showing in the layout */
+    svg {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+}
+
+/* Extra small devices (phones) */
+@media (max-width: 480px) {
+    .status-indicators {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Make buttons more touch-friendly on small screens */
+    button {
+        padding: 8px !important;
+        min-height: 44px;
+    }
+    
+    /* Better spacing for small screens */
+    .filter-status-container > * {
+        margin-bottom: 8px;
+    }
+}

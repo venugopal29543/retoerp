@@ -1,0 +1,74 @@
+/* Plot visualization responsive fixes */
+
+/* Base styles for the plot layout */
+.plot-visualization {
+    width: 100%;
+    height: auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.plot-visualization svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Ensure plot layout doesn't show fragments */
+#plot-layout-container {
+    position: relative;
+}
+
+/* Status indicators */
+.status-indicators {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+/* Status card styles */
+.status-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.status-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .filter-status-container {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .search-filter-controls {
+        margin-bottom: 15px;
+    }
+    
+    /* Ensure filter buttons stack properly */
+    .filter-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .filter-buttons > * {
+        margin-bottom: 8px;
+        width: 100%;
+    }
+    
+    /* Make status indicators more compact */
+    .status-indicators {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small devices */
+    .status-card {
+        padding: 8px;
+    }
+}

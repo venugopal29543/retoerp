@@ -2,7 +2,7 @@
 <nav class="bg-blue-600 text-white p-1">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
         <div class="flex items-center space-x-4">
-            <h2 class="text-xl font-bold">SATTENAPALLI Layout Plan</h2>
+            <h6 class="text-xl font-bold">SATTENAPALLI Layout Plan</h6>
             
             <!-- Project Role Indicator -->
             <div class="hidden md:flex items-center space-x-2 bg-blue-700 px-3 py-1 rounded-lg text-sm">

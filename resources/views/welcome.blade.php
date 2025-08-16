@@ -9,6 +9,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
     <!-- CSS Files -->
     <link rel="stylesheet" href="{{ asset('css/plot-layout.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modals.css') }}">
@@ -16,6 +19,9 @@
     
     <!-- Vite Assets (uncomment when running npm run dev) -->
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/plot-layout.css', 'resources/css/modals.css', 'resources/css/forms.css', 'resources/js/plot-manager.js', 'resources/js/role-manager.js', 'resources/js/modal-manager.js']) --}}
+    
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
     
     <style>
         /* Compact UI styles */
@@ -43,6 +49,67 @@
             display: flex;
             gap: 0.5rem;
             align-items: center;
+        }
+        
+        /* Map container styles */
+        .map-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Ensure layout appears above map */
+        .layout-container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Map toggle button */
+        .map-toggle {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .map-toggle:hover {
+            background: #f0f0f0;
+        }
+        
+        /* Mobile adjustments for map */
+        @media (max-width: 768px) {
+            .map-toggle {
+                top: 5px;
+                left: 5px;
+                padding: 6px 10px;
+                font-size: 0.875rem;
+            }
+            
+            /* Hide specific element on mobile */
+            .flex.items-center.gap-4.text-sm.font-medium {
+                display: none !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .map-toggle {
+                top: 3px;
+                left: 3px;
+                padding: 5px 8px;
+                font-size: 0.75rem;
+            }
         }
         
         /* Input and button styles */
@@ -734,8 +801,15 @@
     <!-- Main Content -->
     <div class="max-w-full mx-auto p-2">
         <!-- Compact Header -->
-       <!-- Plot Layout Component -->
-        <x-plot-layout />
+       <!-- Plot Layout Component with Map Background -->
+        <div class="relative bg-white rounded-lg shadow-md mb-4">
+            <div id="map-container" class="map-container rounded-lg"></div>
+            <button id="toggle-map" class="map-toggle">Hide Map</button>
+            
+            <div class="layout-container">
+                <x-plot-layout />
+            </div>
+        </div>
         <!-- Control Panel Component -->
         <x-control-panel />
 
@@ -746,6 +820,9 @@
     <!-- Modal Components -->
     <x-modals.plot-details />
     <x-modals.emi-calculator />
+    
+    <!-- Mobile Bottom Navigation Bar -->
+    <x-layout.mobile-bottom-bar />
 
     <!-- JavaScript Modules -->
     <script src="{{ asset('js/plot-manager.js') }}"></script>
@@ -1183,6 +1260,100 @@
             }
         `;
         document.head.appendChild(style);
+        
+        // Mobile bottom bar functions
+        function scrollToMap() {
+            const mapContainer = document.querySelector('.layout-container');
+            if (mapContainer) {
+                mapContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function toggleSearch() {
+            const searchInput = document.getElementById('plotSearchInput');
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function openNotifications() {
+            console.log('Opening notifications panel');
+            // Implement notifications panel opening logic
+        }
+        
+        function toggleProfile() {
+            console.log('Opening profile panel');
+            // Implement profile panel opening logic
+        }
+        
+        function openEMICalculator() {
+            const emiModal = document.getElementById('emiCalculatorModal');
+            if (emiModal) {
+                emiModal.style.display = 'flex';
+            }
+        }
+        
+        function closeFeaturesPanel() {
+            // Close features panel via Alpine.js
+            const featuresButton = document.querySelector('[x-data]');
+            if (featuresButton && window.Alpine) {
+                window.Alpine.evaluate(featuresButton, 'showFeatures = false');
+            }
+        }
+    </script>
+    
+    <!-- Google Maps Integration Script -->
+    <script>
+        let map;
+        let mapVisible = true;
+        
+        // Initialize Google Maps with coordinates for Sattenapalli
+        function initMap() {
+            // Sattenapalli, Andhra Pradesh coordinates (you should update these to match your exact location)
+            const sattenapalli = { lat: 16.3959, lng: 80.1829 };
+            
+            // Create the map
+            map = new google.maps.Map(document.getElementById("map-container"), {
+                zoom: 17,
+                center: sattenapalli,
+                mapTypeId: "satellite", // Use satellite view to show surrounding developments
+                zoomControl: true,
+                mapTypeControl: true,
+                scaleControl: true,
+                streetViewControl: true,
+                rotateControl: true,
+                fullscreenControl: false
+            });
+            
+            // Add layout boundary polygon (update coordinates to match your actual layout boundary)
+            const layoutCoordinates = [
+                { lat: 16.3945, lng: 80.1815 },
+                { lat: 16.3975, lng: 80.1815 },
+                { lat: 16.3975, lng: 80.1845 },
+                { lat: 16.3945, lng: 80.1845 }
+            ];
+            
+            const layoutBoundary = new google.maps.Polygon({
+                paths: layoutCoordinates,
+                strokeColor: "#FF0000",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#FF0000",
+                fillOpacity: 0.1,
+                map: map
+            });
+            
+            // Set up toggle button
+            document.getElementById("toggle-map").addEventListener("click", toggleMap);
+        }
+        
+        // Toggle map visibility
+        function toggleMap() {
+            mapVisible = !mapVisible;
+            document.getElementById("map-container").style.opacity = mapVisible ? 0.6 : 0;
+            document.getElementById("toggle-map").textContent = mapVisible ? "Hide Map" : "Show Map";
+        }
     </script>
 </body>
 </html>
